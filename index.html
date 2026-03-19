@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlagUtil — Roblox State Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0d0f;
+    --bg2: #111417;
+    --bg3: #181c20;
+    --border: #1e2428;
+    --border2: #252c32;
+    --text: #e8eaec;
+    --muted: #6b7680;
+    --accent: #4ade80;
+    --accent2: #22c55e;
+    --accent-dim: #14532d22;
+    --red: #f87171;
+    --amber: #fbbf24;
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --tag-bg: #1a2a1e;
+    --tag-text: #4ade80;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+    --display: 'Syne', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* Layout */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 0 0 2rem;
+  }
+
+  .sidebar-logo {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+  }
+
+  .sidebar-logo .name {
+    font-family: var(--display);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar-logo .version {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .nav-section {
+    padding: 0.25rem 1rem 0.5rem;
+  }
+
+  .nav-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 0.5rem 0.5rem 0.25rem;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13.5px;
+    transition: all 0.15s;
+    font-family: var(--sans);
+  }
+
+  .nav-link:hover { color: var(--text); background: var(--bg3); }
+  .nav-link.active { color: var(--accent); background: var(--accent-dim); }
+
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border2);
+    flex-shrink: 0;
+  }
+  .nav-link.active .nav-dot { background: var(--accent); }
+
+  /* Main */
+  .main {
+    flex: 1;
+    max-width: none;
+    width: 100%;
+    padding: 4rem 5rem 8rem;
+    min-width: 0;
+  }
+
+  /* Hero */
+  .hero {
+    margin-bottom: 4rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid #1e3a2a;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-family: var(--display);
+    font-size: clamp(2.4rem, 5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero-desc {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+  }
+
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s;
+    cursor: pointer;
+    border: none;
+    font-family: var(--sans);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #052e16;
+  }
+  .btn-primary:hover { background: var(--accent2); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Sections */
+  .section { margin-bottom: 4rem; scroll-margin-top: 2rem; }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+    margin: 2rem 0 0.75rem;
+  }
+
+  p { color: #9aa3ad; margin-bottom: 1rem; line-height: 1.8; }
+  p:last-child { margin-bottom: 0; }
+
+  /* Code blocks */
+  pre {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.5rem;
+    position: relative;
+  }
+
+  pre code {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--text);
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  pre code { background: none; border: none; padding: 0; font-size: 13px; color: inherit; }
+
+  /* Syntax highlighting */
+  .kw { color: #a78bfa; }
+  .fn { color: #60a5fa; }
+  .str { color: #4ade80; }
+  .num { color: #fbbf24; }
+  .cm { color: #4b5563; font-style: italic; }
+  .type { color: #f472b6; }
+  .op { color: #94a3b8; }
+
+  /* API cards */
+  .api-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .api-card:hover { border-color: var(--border2); }
+
+  .api-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .api-name {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--blue);
+  }
+
+  .api-sig {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .api-body { padding: 1rem 1.25rem; }
+  .api-body p { font-size: 13.5px; margin-bottom: 0.5rem; }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .tag-returns { background: #1e3a2a; color: #4ade80; }
+  .tag-yields { background: #1e2a3a; color: #60a5fa; }
+  .tag-void { background: #1e1e2a; color: #a78bfa; }
+  .tag-cleanup { background: #2a1e1e; color: #f87171; }
+
+  /* Params table */
+  .params {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 0.5rem;
+  }
+  .params th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .params td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: #9aa3ad;
+  }
+  .params td:first-child { font-family: var(--mono); color: var(--text); font-size: 12px; }
+  .params td:nth-child(2) { font-family: var(--mono); color: var(--purple); font-size: 12px; }
+  .params tr:last-child td { border-bottom: none; }
+
+  /* Callouts */
+  .callout {
+    border-radius: 8px;
+    padding: 0.875rem 1.1rem;
+    margin: 1.25rem 0;
+    font-size: 13.5px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    border: 1px solid;
+  }
+  .callout-icon { flex-shrink: 0; font-size: 14px; margin-top: 1px; }
+  .callout p { margin: 0; }
+
+  .callout-info { background: #0c1a2e; border-color: #1e3a5a; color: #7cb9f5; }
+  .callout-warn { background: #1f1500; border-color: #3d2a00; color: #d4a017; }
+  .callout-tip  { background: #0a1f0f; border-color: #1a3d22; color: #5cb87a; }
+
+  /* Feature grid */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 1.5rem 0;
+  }
+
+  .feature-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+  }
+
+  .feature-icon {
+    font-size: 18px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .feature-card h4 {
+    font-family: var(--display);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .feature-card p { font-size: 12.5px; color: var(--muted); margin: 0; }
+
+  /* Copy button */
+  .pre-wrap { position: relative; }
+  .copy-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+  .copy-btn.copied { color: var(--accent); border-color: var(--accent); }
+
+  /* Footer */
+  .footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .footer a { color: var(--accent); text-decoration: none; }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 2rem 1.25rem 5rem; }
+    h2 { font-size: 1.4rem; }
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero { animation: fadeUp 0.5s ease both; }
+  .section { animation: fadeUp 0.5s ease both; }
+  .section:nth-child(2) { animation-delay: 0.05s; }
+  .section:nth-child(3) { animation-delay: 0.1s; }
+  .section:nth-child(4) { animation-delay: 0.15s; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="name"><span style="color:var(--text)">Flag</span><span style="color:var(--accent)">Util</span></div>
+    <div class="version">v1.0.0 · Luau · Roblox</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Getting Started</div>
+    <a href="#overview" class="nav-link active"><span class="nav-dot"></span>Overview</a>
+    <a href="#installation" class="nav-link"><span class="nav-dot"></span>Installation</a>
+    <a href="#quickstart" class="nav-link"><span class="nav-dot"></span>Quick Start</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">API Reference</div>
+    <a href="#m-new" class="nav-link"><span class="nav-dot"></span>flag.new()</a>
+    <a href="#m-up" class="nav-link"><span class="nav-dot"></span>flag:Up()</a>
+    <a href="#m-down" class="nav-link"><span class="nav-dot"></span>flag:Down()</a>
+    <a href="#m-toggle" class="nav-link"><span class="nav-dot"></span>flag:Toggle()</a>
+    <a href="#m-get" class="nav-link"><span class="nav-dot"></span>flag:Get()</a>
+    <a href="#m-changed" class="nav-link"><span class="nav-dot"></span>flag:Changed()</a>
+    <a href="#m-onevent" class="nav-link"><span class="nav-dot"></span>flag:OnEvent()</a>
+    <a href="#m-waituntil" class="nav-link"><span class="nav-dot"></span>flag:WaitUntil()</a>
+    <a href="#m-executeuntil" class="nav-link"><span class="nav-dot"></span>flag:ExecuteUntil()</a>
+    <a href="#m-executeafter" class="nav-link"><span class="nav-dot"></span>flag:ExecuteAfter()</a>
+    <a href="#m-destroy" class="nav-link"><span class="nav-dot"></span>flag:Destroy()</a>
+    <a href="#types" class="nav-link"><span class="nav-dot"></span>Types</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Examples</div>
+    <a href="#ex-flashlight" class="nav-link"><span class="nav-dot"></span>Flashlight Toggle</a>
+    <a href="#ex-combat" class="nav-link"><span class="nav-dot"></span>Combat State</a>
+    <a href="#ex-loading" class="nav-link"><span class="nav-dot"></span>Loading Gate</a>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">
+      <span style="color:var(--accent)">◆</span> Roblox / Luau
+    </div>
+    <h1>Flag<span>Util</span></h1>
+    <p class="hero-desc">
+      A lightweight, type-safe boolean state machine for Roblox. React to state changes, run frame-perfect loops, and coordinate async behavior — all without polling.
+    </p>
+    <div class="hero-actions">
+      <a href="#quickstart" class="btn btn-primary">Get Started</a>
+      <a href="#api-reference" class="btn btn-secondary">API Reference</a>
+    </div>
+  </div>
+
+  <!-- Overview -->
+  <section class="section" id="overview">
+    <h2>Overview</h2>
+    <p>
+      FlagUtil wraps a single boolean into a rich reactive object. Instead of scattering <code>if isAlive then</code> checks across your codebase, you declare intent: <em>run this while the flag is Up, stop when it goes Down.</em>
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h4>Frame-perfect execution</h4>
+        <p>ExecuteUntil binds to RenderStep — zero polling, zero drift.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔒</span>
+        <h4>Fully typed</h4>
+        <p>Exported Luau types for Flag, CancelFn, and States.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🧹</span>
+        <h4>Self-cleaning</h4>
+        <p>All connections, threads, and RenderStep bindings cleaned on Destroy.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🎯</span>
+        <h4>Cancellable</h4>
+        <p>Every async operation returns a CancelFn you can call at any time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation -->
+  <section class="section" id="installation">
+    <h2>Installation</h2>
+    <p>Place <code>FlagUtil.lua</code> (or <code>FlagUtil.luau</code>) inside <code>ReplicatedStorage</code> or wherever your shared modules live. Then require it from any script:</p>
+
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> <span class="fn">FlagUtil</span> <span class="op">=</span> require(game.ReplicatedStorage:WaitForChild(<span class="str">"FlagUtil"</span>))</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ</span>
+      <p>FlagUtil has no external dependencies. It only requires <code>RunService</code> from Roblox services.</p>
+    </div>
+  </section>
+
+  <!-- Quick Start -->
+  <section class="section" id="quickstart">
+    <h2>Quick Start</h2>
+    <p>Create a flag, react to it, and clean up when done.</p>
+
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> <span class="fn">FlagUtil</span> <span class="op">=</span> require(game.ReplicatedStorage:WaitForChild(<span class="str">"FlagUtil"</span>))
+
+<span class="cm">-- Create a flag starting in the Up (true) state</span>
+<span class="kw">local</span> isAlive <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Up)
+
+<span class="cm">-- React to every change</span>
+isAlive:<span class="fn">Changed</span>(<span class="kw">function</span>(state: boolean)
+    <span class="kw">if</span> state <span class="kw">then</span>
+        print(<span class="str">"Player is alive"</span>)
+    <span class="kw">else</span>
+        print(<span class="str">"Player died"</span>)
+    <span class="kw">end</span>
+<span class="kw">end</span>)
+
+<span class="cm">-- Run something every frame while alive</span>
+isAlive:<span class="fn">ExecuteUntil</span>(FlagUtil.States.Down, <span class="kw">function</span>(dt: number)
+    <span class="cm">-- update health bar, run animations, etc.</span>
+<span class="kw">end</span>)
+
+<span class="cm">-- Flip the flag</span>
+isAlive:<span class="fn">Down</span>() <span class="cm">-- ExecuteUntil stops, Changed fires</span>
+
+<span class="cm">-- Clean up everything</span>
+isAlive:<span class="fn">Destroy</span>()</code></pre>
+    </div>
+  </section>
+
+  <!-- API Reference -->
+  <section class="section" id="api-reference">
+    <h2>API Reference</h2>
+    <p>Each method is documented individually below. Click any entry in the sidebar to jump directly to it.</p>
+  </section>
+
+  <!-- flag.new -->
+  <section class="section" id="m-new">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag.new</span>
+        <span class="api-sig">(state: boolean) → Flag</span>
+        <span class="tag tag-returns">returns Flag</span>
+      </div>
+      <div class="api-body">
+        <p>Creates a new Flag instance with the given initial state. Use <code>FlagUtil.States.Up</code> (<code>true</code>) or <code>FlagUtil.States.Down</code> (<code>false</code>). Asserts if a non-boolean is passed.</p>
+        <table class="params">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>state</td><td>boolean</td><td>The initial state of the flag.</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> f <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Up)   <span class="cm">-- starts Up (true)</span>
+<span class="kw">local</span> f <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Down) <span class="cm">-- starts Down (false)</span></code></pre>
+    </div>
+  </section>
+
+  <!-- flag:Up -->
+  <section class="section" id="m-up">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag:Up</span>
+        <span class="api-sig">() → ()</span>
+        <span class="tag tag-void">void</span>
+      </div>
+      <div class="api-body">
+        <p>Sets the flag to <code>Up</code> (<code>true</code>) and notifies all listeners. Prints a warning if the flag is already Up.</p>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code>f:<span class="fn">Up</span>()
+print(f:<span class="fn">Get</span>()) <span class="cm">-- true</span></code></pre>
+    </div>
+  </section>
+
+  <!-- flag:Down -->
+  <section class="section" id="m-down">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag:Down</span>
+        <span class="api-sig">() → ()</span>
+        <span class="tag tag-void">void</span>
+      </div>
+      <div class="api-body">
+        <p>Sets the flag to <code>Down</code> (<code>false</code>) and notifies all listeners. Prints a warning if the flag is already Down.</p>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code>f:<span class="fn">Down</span>()
+print(f:<span class="fn">Get</span>()) <span class="cm">-- false</span></code></pre>
+    </div>
+  </section>
+
+  <!-- flag:Toggle -->
+  <section class="section" id="m-toggle">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag:Toggle</span>
+        <span class="api-sig">() → ()</span>
+        <span class="tag tag-void">void</span>
+      </div>
+      <div class="api-body">
+        <p>Flips the current state. Calls <code>Down()</code> if currently Up, <code>Up()</code> if currently Down. Triggers all listeners.</p>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> f <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Up)
+f:<span class="fn">Toggle</span>()
+print(f:<span class="fn">Get</span>()) <span class="cm">-- false</span>
+f:<span class="fn">Toggle</span>()
+print(f:<span class="fn">Get</span>()) <span class="cm">-- true</span></code></pre>
+    </div>
+  </section>
+
+  <!-- flag:Get -->
+  <section class="section" id="m-get">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag:Get</span>
+        <span class="api-sig">() → boolean</span>
+        <span class="tag tag-returns">returns boolean</span>
+      </div>
+      <div class="api-body">
+        <p>Returns the current state as a raw boolean. Use this to read the flag value inline without side effects.</p>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">if</span> f:<span class="fn">Get</span>() <span class="op">==</span> FlagUtil.States.Up <span class="kw">then</span>
+    print(<span class="str">"flag is Up"</span>)
+<span class="kw">end</span></code></pre>
+    </div>
+  </section>
+
+  <!-- flag:Changed -->
+  <section class="section" id="m-changed">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag:Changed</span>
+        <span class="api-sig">(predicate: (boolean) → ()) → CancelFn</span>
+        <span class="tag tag-cleanup">CancelFn</span>
+      </div>
+      <div class="api-body">
+        <p>Registers a callback that fires every time the state changes. The callback receives the new state as a boolean. Returns a <code>CancelFn</code> — call it to unsubscribe at any time.</p>
+        <table class="params">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>predicate</td><td>(boolean) → ()</td><td>Called with the new state value on every change.</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> cancel <span class="op">=</span> f:<span class="fn">Changed</span>(<span class="kw">function</span>(state: boolean)
+    print(<span class="str">"state is now"</span>, state)
+<span class="kw">end</span>)
+
+f:<span class="fn">Down</span>() <span class="cm">-- fires callback</span>
+
+<span class="fn">cancel</span>() <span class="cm">-- unsubscribe</span>
+f:<span class="fn">Up</span>()   <span class="cm">-- callback no longer fires</span></code></pre>
+    </div>
+  </section>
+
+  <!-- flag:OnEvent -->
+  <section class="section" id="m-onevent">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag:OnEvent</span>
+        <span class="api-sig">(event: RBXScriptSignal, state: boolean) → ()</span>
+        <span class="tag tag-void">void</span>
+      </div>
+      <div class="api-body">
+        <p>Connects an <code>RBXScriptSignal</code> so that when it fires, the flag transitions to <code>state</code>. Uses <code>:Once()</code> internally — auto-disconnects after firing once.</p>
+        <table class="params">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>event</td><td>RBXScriptSignal</td><td>Any Roblox signal, e.g. <code>humanoid.Died</code>.</td></tr>
+          <tr><td>state</td><td>boolean</td><td>The state to transition to when the event fires.</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> isAlive <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Up)
+
+<span class="cm">-- Automatically go Down when the humanoid dies</span>
+isAlive:<span class="fn">OnEvent</span>(humanoid.Died, FlagUtil.States.Down)</code></pre>
+    </div>
+  </section>
+
+  <!-- flag:WaitUntil -->
+  <section class="section" id="m-waituntil">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag:WaitUntil</span>
+        <span class="api-sig">(state: boolean) → ()</span>
+        <span class="tag tag-yields">yields</span>
+      </div>
+      <div class="api-body">
+        <p>Yields the current coroutine until the flag reaches <code>state</code>. Returns immediately if already at that state. Must be called inside a coroutine or <code>task.spawn</code>.</p>
+        <table class="params">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>state</td><td>boolean</td><td>The state to wait for.</td></tr>
+        </table>
+        <div class="callout callout-info" style="margin-top:0.75rem;">
+          <span class="callout-icon">ℹ</span>
+          <p>Calling this outside a coroutine prints a warning and returns immediately without yielding.</p>
+        </div>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code>task.<span class="fn">spawn</span>(<span class="kw">function</span>()
+    f:<span class="fn">WaitUntil</span>(FlagUtil.States.Down)
+    print(<span class="str">"flag went Down!"</span>)
+<span class="kw">end</span>)
+
+task.<span class="fn">wait</span>(<span class="num">2</span>)
+f:<span class="fn">Down</span>() <span class="cm">-- resumes the coroutine above</span></code></pre>
+    </div>
+  </section>
+
+  <!-- flag:ExecuteUntil -->
+  <section class="section" id="m-executeuntil">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag:ExecuteUntil</span>
+        <span class="api-sig">(state: boolean, predicate: (dt: number, ...any) → (), ...any) → CancelFn?</span>
+        <span class="tag tag-cleanup">CancelFn?</span>
+      </div>
+      <div class="api-body">
+        <p>Binds <code>predicate</code> to <code>RenderStep</code> and calls it every frame until the flag reaches <code>state</code>. Passes <code>delta_time</code> as the first argument, followed by any extra args you provide. Returns a <code>CancelFn</code> to stop early, or <code>nil</code> if the flag is already at <code>state</code>.</p>
+        <table class="params">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>state</td><td>boolean</td><td>Stop executing when the flag reaches this state.</td></tr>
+          <tr><td>predicate</td><td>(dt: number, ...any) → ()</td><td>Called every frame with delta time and any extra args.</td></tr>
+          <tr><td>...</td><td>any</td><td>Extra arguments forwarded to predicate on every frame.</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> cancel <span class="op">=</span> f:<span class="fn">ExecuteUntil</span>(FlagUtil.States.Down, <span class="kw">function</span>(dt: number)
+    character.HumanoidRootPart.CFrame <span class="op">*=</span> CFrame.<span class="fn">new</span>(<span class="num">0</span>, dt <span class="op">*</span> <span class="num">2</span>, <span class="num">0</span>)
+<span class="kw">end</span>)
+
+f:<span class="fn">Down</span>()   <span class="cm">-- stops automatically</span>
+<span class="fn">cancel</span>()   <span class="cm">-- or stop manually at any time</span></code></pre>
+    </div>
+  </section>
+
+  <!-- flag:ExecuteAfter -->
+  <section class="section" id="m-executeafter">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag:ExecuteAfter</span>
+        <span class="api-sig">(state: boolean, predicate: (dt: number, ...any) → (), ...any) → CancelFn</span>
+        <span class="tag tag-cleanup">CancelFn</span>
+      </div>
+      <div class="api-body">
+        <p>Waits until the flag reaches <code>state</code>, then runs <code>predicate</code> every frame until the flag flips to the opposite state. Equivalent to <code>WaitUntil(state)</code> followed by <code>ExecuteUntil(not state, ...)</code>. Always returns a <code>CancelFn</code>.</p>
+        <table class="params">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>state</td><td>boolean</td><td>Wait for this state before starting execution.</td></tr>
+          <tr><td>predicate</td><td>(dt: number, ...any) → ()</td><td>Called every frame once the state is reached.</td></tr>
+          <tr><td>...</td><td>any</td><td>Extra arguments forwarded to predicate on every frame.</td></tr>
+        </table>
+        <div class="callout callout-tip" style="margin-top:0.75rem;">
+          <span class="callout-icon">✦</span>
+          <p>The returned <code>CancelFn</code> works in both phases — before the state is reached it cancels the wait; after, it cancels the RenderStep.</p>
+        </div>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> sprinting <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Down)
+
+<span class="kw">local</span> cancel <span class="op">=</span> sprinting:<span class="fn">ExecuteAfter</span>(FlagUtil.States.Up, <span class="kw">function</span>(dt: number)
+    stamina <span class="op">-=</span> dt <span class="op">*</span> <span class="num">10</span>
+<span class="kw">end</span>)
+
+sprinting:<span class="fn">Up</span>()   <span class="cm">-- stamina drain begins</span>
+sprinting:<span class="fn">Down</span>() <span class="cm">-- stamina drain stops</span>
+<span class="fn">cancel</span>()         <span class="cm">-- or cancel at any point</span></code></pre>
+    </div>
+  </section>
+
+  <!-- flag:Destroy -->
+  <section class="section" id="m-destroy">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag:Destroy</span>
+        <span class="api-sig">() → ()</span>
+        <span class="tag tag-void">void</span>
+      </div>
+      <div class="api-body">
+        <p>Cancels all pending threads, disconnects all <code>RBXScriptConnection</code>s, unbinds all RenderStep callbacks, clears internal tables, and removes the metatable. The flag object is unusable after this call.</p>
+        <div class="callout callout-warn" style="margin-top:0.75rem;">
+          <span class="callout-icon">⚠</span>
+          <p>Always call <code>Destroy()</code> when the owning object is removed. Failing to do so leaks RenderStep bindings and suspended coroutines.</p>
+        </div>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code>player.CharacterRemoving:<span class="fn">Connect</span>(<span class="kw">function</span>()
+    isAlive:<span class="fn">Destroy</span>()
+<span class="kw">end</span>)</code></pre>
+    </div>
+  </section>
+
+  <!-- Types -->
+  <section class="section" id="types">
+    <h3>Exported Types</h3>
+
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="cm">-- A function that cancels an async operation</span>
+<span class="kw">export type</span> <span class="type">CancelFn</span> <span class="op">=</span> () <span class="op">-></span> ()
+
+<span class="cm">-- The States lookup table shape</span>
+<span class="kw">export type</span> <span class="type">States</span> <span class="op">=</span> {
+    Up: boolean,
+    Down: boolean
+}
+
+<span class="cm">-- Full Flag interface</span>
+<span class="kw">export type</span> <span class="type">Flag</span> <span class="op">=</span> {
+    Get:          (self: <span class="type">Flag</span>) <span class="op">-></span> boolean,
+    Up:           (self: <span class="type">Flag</span>) <span class="op">-></span> (),
+    Down:         (self: <span class="type">Flag</span>) <span class="op">-></span> (),
+    Toggle:       (self: <span class="type">Flag</span>) <span class="op">-></span> (),
+
+    Changed:      (self: <span class="type">Flag</span>, predicate: (boolean) <span class="op">-></span> ()) <span class="op">-></span> <span class="type">CancelFn</span>,
+    OnEvent:      (self: <span class="type">Flag</span>, event: RBXScriptSignal, state: boolean) <span class="op">-></span> (),
+
+    WaitUntil:    (self: <span class="type">Flag</span>, state: boolean) <span class="op">-></span> (),
+    ExecuteUntil: (self: <span class="type">Flag</span>, state: boolean, predicate: (dt: number, ...any) <span class="op">-></span> (), ...any) <span class="op">-></span> <span class="type">CancelFn</span>?,
+    ExecuteAfter: (self: <span class="type">Flag</span>, state: boolean, predicate: (dt: number, ...any) <span class="op">-></span> (), ...any) <span class="op">-></span> <span class="type">CancelFn</span>,
+
+    Destroy:      (self: <span class="type">Flag</span>) <span class="op">-></span> (),
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- Examples -->
+  <section class="section" id="ex-flashlight">
+    <h2>Examples</h2>
+    <h3>Flashlight Toggle</h3>
+    <p>Toggle a spotlight on/off with <code>F</code>, running a sway effect only while the flashlight is on.</p>
+
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> FlagUtil <span class="op">=</span> require(game.ReplicatedStorage:WaitForChild(<span class="str">"FlagUtil"</span>))
+<span class="kw">local</span> UIS <span class="op">=</span> game:GetService(<span class="str">"UserInputService"</span>)
+
+<span class="kw">local</span> flashlight <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Down)
+
+<span class="cm">-- Toggle on F key</span>
+UIS.InputBegan:<span class="fn">Connect</span>(<span class="kw">function</span>(input, processed)
+    <span class="kw">if</span> processed <span class="kw">then</span> <span class="kw">return</span> <span class="kw">end</span>
+    <span class="kw">if</span> input.KeyCode <span class="op">==</span> Enum.KeyCode.F <span class="kw">then</span>
+        flashlight:<span class="fn">Toggle</span>()
+    <span class="kw">end</span>
+<span class="kw">end</span>)
+
+<span class="cm">-- Update spotlight visibility on change</span>
+flashlight:<span class="fn">Changed</span>(<span class="kw">function</span>(on)
+    spotlight.Enabled <span class="op">=</span> on
+<span class="kw">end</span>)
+
+<span class="cm">-- Run sway animation only while on</span>
+flashlight:<span class="fn">ExecuteAfter</span>(FlagUtil.States.Up, <span class="kw">function</span>(dt)
+    <span class="cm">-- update attachment CFrame for sway</span>
+<span class="kw">end</span>)</code></pre>
+    </div>
+  </section>
+
+  <section class="section" id="ex-combat">
+    <h3>Combat State</h3>
+    <p>Lock out actions during an attack animation using <code>WaitUntil</code>.</p>
+
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> attacking <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Down)
+
+<span class="kw">local function</span> <span class="fn">attack</span>()
+    <span class="kw">if</span> attacking:<span class="fn">Get</span>() <span class="kw">then</span> <span class="kw">return</span> <span class="kw">end</span> <span class="cm">-- busy</span>
+    attacking:<span class="fn">Up</span>()
+    
+    <span class="cm">-- Play anim, wait for it to finish</span>
+    <span class="kw">local</span> track <span class="op">=</span> animator:<span class="fn">LoadAnimation</span>(attackAnim)
+    track:<span class="fn">Play</span>()
+    track.Stopped:<span class="fn">Wait</span>()
+    
+    attacking:<span class="fn">Down</span>()
+<span class="kw">end</span>
+
+<span class="cm">-- Wait for attack to end before doing something else</span>
+task.<span class="fn">spawn</span>(<span class="kw">function</span>()
+    attacking:<span class="fn">WaitUntil</span>(FlagUtil.States.Down)
+    print(<span class="str">"Attack finished, can combo now"</span>)
+<span class="kw">end</span>)</code></pre>
+    </div>
+  </section>
+
+  <section class="section" id="ex-loading">
+    <h3>Loading Gate</h3>
+    <p>Block game logic until assets are ready using <code>OnEvent</code> and <code>WaitUntil</code>.</p>
+
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> loaded <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Down)
+
+<span class="cm">-- Flip Up when ContentProvider finishes</span>
+task.<span class="fn">spawn</span>(<span class="kw">function</span>()
+    ContentProvider:<span class="fn">PreloadAsync</span>(assetsToLoad)
+    loaded:<span class="fn">Up</span>()
+<span class="kw">end</span>)
+
+<span class="cm">-- Multiple systems can independently wait</span>
+task.<span class="fn">spawn</span>(<span class="kw">function</span>()
+    loaded:<span class="fn">WaitUntil</span>(FlagUtil.States.Up)
+    <span class="fn">initUI</span>()
+<span class="kw">end</span>)
+
+task.<span class="fn">spawn</span>(<span class="kw">function</span>()
+    loaded:<span class="fn">WaitUntil</span>(FlagUtil.States.Up)
+    <span class="fn">startGameLoop</span>()
+<span class="kw">end</span>)</code></pre>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>FlagUtil · Luau · Roblox</span>
+    <span>Built with ♥ for clean state management</span>
+  </div>
+
+</main>
+</div>
+
+<script>
+  function copyCode(btn) {
+    const pre = btn.nextElementSibling;
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // Active nav link on scroll
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === '#' + entry.target.id) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

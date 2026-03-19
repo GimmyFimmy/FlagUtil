@@ -1,0 +1,10 @@
+# Project place file
+/FlagUtil.rbxlx
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+sourcemap.json
+default.project.json
+aftman.toml
