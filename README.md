@@ -1,269 +1,73 @@
 # FlagUtil
 
-A lightweight, type-safe boolean state machine for Roblox. React to state changes, run frame-perfect loops, and coordinate async behavior — all without polling.
+[![Documentation](https://img.shields.io/badge/docs-online-4ade80?style=flat-square)](https://your-username.github.io/your-repo-name/)
+[![Luau](https://img.shields.io/badge/language-Luau-60a5fa?style=flat-square)]()
+[![Roblox](https://img.shields.io/badge/platform-Roblox-f87171?style=flat-square)]()
 
-```lua
-local isAlive = FlagUtil.new(FlagUtil.States.Up)
+FlagUtil is a small, type-safe boolean state machine for Roblox. It wraps a single `true/false` value into a reactive object — you declare what should happen when the flag goes Up or Down, and FlagUtil takes care of the rest.
 
-isAlive:OnEvent(humanoid.Died, FlagUtil.States.Down)
+Instead of scattering `if isSprinting then` checks across your codebase, you bind behavior directly to state transitions. Loops start and stop automatically. Coroutines yield and resume cleanly. Every async operation returns a cancel function so you stay in control.
 
-isAlive:ExecuteUntil(FlagUtil.States.Down, function(dt)
-    -- runs every frame while alive
-end)
-
-isAlive:Changed(function(state)
-    print("alive:", state)
-end)
+```
+Up ──────────────────────────────► Down
+     ExecuteUntil fires every frame
+     WaitUntil resumes coroutines
+     Changed notifies listeners
 ```
 
 ---
 
-## Installation
-
-Place `FlagUtil.lua` inside `ReplicatedStorage` (or any shared module folder), then require it:
+## Example
 
 ```lua
 local FlagUtil = require(game.ReplicatedStorage:WaitForChild("FlagUtil"))
-```
+local UserInputService = game:GetService("UserInputService")
 
-No external dependencies. Only requires `RunService` from Roblox services.
-
----
-
-## API Reference
-
-### `flag.new(state: boolean) → Flag`
-
-Creates a new Flag instance. Pass `FlagUtil.States.Up` (`true`) or `FlagUtil.States.Down` (`false`). Asserts if a non-boolean is passed.
-
-```lua
-local f = FlagUtil.new(FlagUtil.States.Up)
-```
-
----
-
-### `flag:Up() → ()`
-
-Sets the flag to `Up` (`true`) and notifies all listeners. Warns if already Up.
-
----
-
-### `flag:Down() → ()`
-
-Sets the flag to `Down` (`false`) and notifies all listeners. Warns if already Down.
-
----
-
-### `flag:Toggle() → ()`
-
-Flips the current state. Calls `Down()` if currently Up, `Up()` if currently Down.
-
----
-
-### `flag:Get() → boolean`
-
-Returns the current state as a raw boolean.
-
-```lua
-if f:Get() == FlagUtil.States.Up then
-    print("flag is Up")
-end
-```
-
----
-
-### `flag:Changed(predicate: (boolean) → ()) → CancelFn`
-
-Registers a callback that fires every time the state changes. Returns a `CancelFn` to unsubscribe.
-
-```lua
-local cancel = f:Changed(function(state)
-    print("state changed to:", state)
-end)
-
--- Later, unsubscribe
-cancel()
-```
-
----
-
-### `flag:OnEvent(event: RBXScriptSignal, state: boolean) → ()`
-
-Connects an `RBXScriptSignal` so that when it fires, the flag transitions to `state`. Uses `:Once()` internally — auto-disconnects after the first fire.
-
-```lua
-local isAlive = FlagUtil.new(FlagUtil.States.Up)
-isAlive:OnEvent(humanoid.Died, FlagUtil.States.Down)
-```
-
----
-
-### `flag:WaitUntil(state: boolean) → ()` ⏸ yields
-
-Yields the current coroutine until the flag reaches `state`. Returns immediately if already there. Must be called inside a coroutine or `task.spawn`.
-
-```lua
-task.spawn(function()
-    f:WaitUntil(FlagUtil.States.Down)
-    print("flag went Down")
-end)
-```
-
----
-
-### `flag:ExecuteUntil(state: boolean, predicate: (dt: number, ...any) → (), ...any) → CancelFn?`
-
-Binds `predicate` to `RenderStep` and calls it every frame until the flag reaches `state`. Returns a `CancelFn` to stop early, or `nil` if the flag is already at `state`.
-
-| Parameter | Type | Description |
-|---|---|---|
-| `state` | `boolean` | Stop when the flag reaches this state |
-| `predicate` | `(dt: number, ...any) → ()` | Called every frame with delta time and any extra args |
-| `...` | `any` | Extra arguments forwarded to the predicate each frame |
-
-```lua
-local cancel = f:ExecuteUntil(FlagUtil.States.Down, function(dt)
-    -- runs every frame until Down
-end)
-
-cancel() -- stop early if needed
-```
-
----
-
-### `flag:ExecuteAfter(state: boolean, predicate: (dt: number, ...any) → (), ...any) → CancelFn`
-
-Waits until the flag reaches `state`, then runs `predicate` every frame until the flag flips back. Equivalent to `WaitUntil(state)` → `ExecuteUntil(not state, ...)`. Always returns a `CancelFn`.
-
-> The cancel function works in both phases — before the state is reached it cancels the wait; after, it cancels the RenderStep.
-
-```lua
 local sprinting = FlagUtil.new(FlagUtil.States.Down)
 
-local cancel = sprinting:ExecuteAfter(FlagUtil.States.Up, function(dt)
+-- Drain stamina every frame while the player is sprinting
+sprinting:ExecuteAfter(FlagUtil.States.Up, function(dt: number)
     stamina -= dt * 10
 end)
 
-sprinting:Up()   -- stamina drain begins
-sprinting:Down() -- stamina drain stops
-cancel()         -- or cancel at any point
-```
-
----
-
-### `flag:Destroy() → ()`
-
-Cancels all pending threads, disconnects all connections, unbinds all RenderStep callbacks, and removes the metatable. The flag is unusable after this call.
-
-> Always call `Destroy()` when the owning object is removed to prevent leaking RenderStep bindings and suspended coroutines.
-
-```lua
-player.CharacterRemoving:Connect(function()
-    isAlive:Destroy()
+-- Update the UI whenever the state changes
+sprinting:Changed(function(state: boolean)
+    sprintIcon.ImageTransparency = state and 0 or 0.5
 end)
-```
 
----
-
-## Types
-
-```lua
-export type CancelFn = () -> ()
-
-export type States = {
-    Up: boolean,
-    Down: boolean,
-}
-
-export type Flag = {
-    Get:          (self: Flag) -> boolean,
-    Up:           (self: Flag) -> (),
-    Down:         (self: Flag) -> (),
-    Toggle:       (self: Flag) -> (),
-
-    Changed:      (self: Flag, predicate: (boolean) -> ()) -> CancelFn,
-    OnEvent:      (self: Flag, event: RBXScriptSignal, state: boolean) -> (),
-
-    WaitUntil:    (self: Flag, state: boolean) -> (),
-    ExecuteUntil: (self: Flag, state: boolean, predicate: (dt: number, ...any) -> (), ...any) -> CancelFn?,
-    ExecuteAfter: (self: Flag, state: boolean, predicate: (dt: number, ...any) -> (), ...any) -> CancelFn,
-
-    Destroy:      (self: Flag) -> (),
-}
-```
-
----
-
-## Examples
-
-### Flashlight toggle
-
-```lua
-local flashlight = FlagUtil.new(FlagUtil.States.Down)
-
+-- Toggle sprint on Shift
 UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
-    if input.KeyCode == Enum.KeyCode.F then
-        flashlight:Toggle()
+    if input.KeyCode == Enum.KeyCode.LeftShift then
+        sprinting:Up()
     end
 end)
 
-flashlight:Changed(function(on)
-    spotlight.Enabled = on
+UserInputService.InputEnded:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.LeftShift then
+        sprinting:Down()
+    end
 end)
 
-flashlight:ExecuteAfter(FlagUtil.States.Up, function(dt)
-    -- sway animation while flashlight is on
-end)
-```
-
-### Combat lock
-
-```lua
-local attacking = FlagUtil.new(FlagUtil.States.Down)
-
-local function attack()
-    if attacking:Get() then return end
-    attacking:Up()
-
-    local track = animator:LoadAnimation(attackAnim)
-    track:Play()
-    track.Stopped:Wait()
-
-    attacking:Down()
-end
-
--- Wait for the attack to finish before doing something else
-task.spawn(function()
-    attacking:WaitUntil(FlagUtil.States.Down)
-    print("can combo now")
+-- Clean up when the character is removed
+player.CharacterRemoving:Connect(function()
+    sprinting:Destroy()
 end)
 ```
 
-### Loading gate
-
-```lua
-local loaded = FlagUtil.new(FlagUtil.States.Down)
-
-task.spawn(function()
-    ContentProvider:PreloadAsync(assets)
-    loaded:Up()
-end)
-
--- Multiple systems wait independently
-task.spawn(function()
-    loaded:WaitUntil(FlagUtil.States.Up)
-    initUI()
-end)
-
-task.spawn(function()
-    loaded:WaitUntil(FlagUtil.States.Up)
-    startGameLoop()
-end)
-```
+For the full API reference and more examples, see the **[documentation](https://your-username.github.io/your-repo-name/)**.
 
 ---
 
-## License
+## Contributing
 
-MIT
+Contributions are welcome. If you find a bug, have a feature idea, or want to improve the docs, feel free to open an issue or a pull request.
+
+A few things to keep in mind before submitting:
+
+- **Keep it small.** FlagUtil is intentionally minimal. New methods should solve a clear problem that can't already be handled by composing existing ones.
+- **Match the style.** Use the same assertion pattern (`assert(typeof(...) == "boolean", "[FlagUtil]: ...")`), keep types exported, and return a `CancelFn` from anything async.
+- **Write a test.** If your change touches logic, add a corresponding case to the test script so it can be verified.
+- **One thing per PR.** Focused pull requests are easier to review and faster to merge.
+
+If you're unsure whether an idea fits, open an issue first and we can discuss it before you write any code.
