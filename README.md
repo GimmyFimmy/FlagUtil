@@ -1,6 +1,6 @@
 # FlagUtil
 
-[![Documentation](https://img.shields.io/badge/docs-online-4ade80?style=flat-square)](https://your-username.github.io/your-repo-name/)
+[![Documentation](https://img.shields.io/badge/docs-online-4ade80?style=flat-square)](https://GimmyFimmy.github.io/FlagUtil/)
 [![Luau](https://img.shields.io/badge/language-Luau-60a5fa?style=flat-square)]()
 [![Roblox](https://img.shields.io/badge/platform-Roblox-f87171?style=flat-square)]()
 
