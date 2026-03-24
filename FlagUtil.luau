@@ -25,6 +25,7 @@ export type Flag = {
 	WaitUntil: (self: Flag, state: boolean) -> (),
 	ExecuteUntil: (self: Flag, state: boolean, predicate: (delta_time: number, ...any) -> (), ...any) -> CancelFn | nil,
 	ExecuteAfter: (self: Flag, state: boolean, predicate: (delta_time: number, ...any) -> (), ...any) -> CancelFn | nil,
+	ExecuteWhile: (self: Flag, state: boolean, predicate: (delta_time: number, ...any) -> (), ...any) -> CancelFn | nil,
 
 	Destroy: (self: Flag) -> ()
 }
@@ -176,6 +177,31 @@ function flag:ExecuteAfter(state: boolean, predicate: (number, any) -> (), ...):
 		else
 			task.cancel(cache.__thread)
 		end
+	end
+end
+
+function flag:ExecuteWhile(state: boolean, predicate: (number, any) -> (), ...): CancelFn | nil
+	assert(typeof(state) == "boolean", "[FlagUtil]: State must be boolean!")
+	assert(typeof(predicate) == "function", "[FlagUtil]: Predicate must be function!")
+
+	local key = tostring(newproxy())
+	local args = { ... }
+
+	local cancel = function()
+		return run_service:UnbindFromRenderStep(key)
+	end
+
+	run_service:BindToRenderStep(key, Enum.RenderPriority.First.Value + 1, function(delta_time: number)
+		if self.__current_state == state then
+			predicate(delta_time, table.unpack(args))
+		end
+	end)
+
+	table.insert(self.__executors, cancel)
+
+	return function ()
+		cancel()
+		table.remove(self.__executors, table.find(self.__executors, cancel))
 	end
 end
 

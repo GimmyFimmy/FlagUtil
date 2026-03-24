@@ -42,10 +42,12 @@
     min-height: 100vh;
   }
 
+  /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 
+  /* Layout */
   .layout { display: flex; min-height: 100vh; }
 
   /* Sidebar */
@@ -82,7 +84,9 @@
     margin-top: 2px;
   }
 
-  .nav-section { padding: 0.25rem 1rem 0.5rem; }
+  .nav-section {
+    padding: 0.25rem 1rem 0.5rem;
+  }
 
   .nav-label {
     font-family: var(--mono);
@@ -184,9 +188,17 @@
     font-family: var(--sans);
   }
 
-  .btn-primary { background: var(--accent); color: #052e16; }
+  .btn-primary {
+    background: var(--accent);
+    color: #052e16;
+  }
   .btn-primary:hover { background: var(--accent2); }
-  .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border2); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
   .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 
   /* Sections */
@@ -225,7 +237,12 @@
     position: relative;
   }
 
-  pre code { font-family: var(--mono); font-size: 13px; line-height: 1.75; color: var(--text); }
+  pre code {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--text);
+  }
 
   code {
     font-family: var(--mono);
@@ -239,14 +256,14 @@
 
   pre code { background: none; border: none; padding: 0; font-size: 13px; color: inherit; }
 
-  /* Syntax */
-  .kw   { color: #a78bfa; }
-  .fn   { color: #60a5fa; }
-  .str  { color: #4ade80; }
-  .num  { color: #fbbf24; }
-  .cm   { color: #4b5563; font-style: italic; }
+  /* Syntax highlighting */
+  .kw { color: #a78bfa; }
+  .fn { color: #60a5fa; }
+  .str { color: #4ade80; }
+  .num { color: #fbbf24; }
+  .cm { color: #4b5563; font-style: italic; }
   .type { color: #f472b6; }
-  .op   { color: #94a3b8; }
+  .op { color: #94a3b8; }
 
   /* API cards */
   .api-card {
@@ -268,8 +285,21 @@
     flex-wrap: wrap;
   }
 
-  .api-name { font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--blue); }
-  .api-sig  { font-family: var(--mono); font-size: 12px; color: var(--muted); flex: 1; min-width: 200px; }
+  .api-name {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--blue);
+  }
+
+  .api-sig {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    flex: 1;
+    min-width: 200px;
+  }
+
   .api-body { padding: 1rem 1.25rem; }
   .api-body p { font-size: 13.5px; margin-bottom: 0.5rem; }
 
@@ -284,12 +314,17 @@
   }
 
   .tag-returns { background: #1e3a2a; color: #4ade80; }
-  .tag-yields  { background: #1e2a3a; color: #60a5fa; }
-  .tag-void    { background: #1e1e2a; color: #a78bfa; }
+  .tag-yields { background: #1e2a3a; color: #60a5fa; }
+  .tag-void { background: #1e1e2a; color: #a78bfa; }
   .tag-cleanup { background: #2a1e1e; color: #f87171; }
 
   /* Params table */
-  .params { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 0.5rem; }
+  .params {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 0.5rem;
+  }
   .params th {
     text-align: left;
     font-family: var(--mono);
@@ -306,7 +341,7 @@
     vertical-align: top;
     color: #9aa3ad;
   }
-  .params td:first-child  { font-family: var(--mono); color: var(--text); font-size: 12px; }
+  .params td:first-child { font-family: var(--mono); color: var(--text); font-size: 12px; }
   .params td:nth-child(2) { font-family: var(--mono); color: var(--purple); font-size: 12px; }
   .params tr:last-child td { border-bottom: none; }
 
@@ -323,6 +358,7 @@
   }
   .callout-icon { flex-shrink: 0; font-size: 14px; margin-top: 1px; }
   .callout p { margin: 0; }
+
   .callout-info { background: #0c1a2e; border-color: #1e3a5a; color: #7cb9f5; }
   .callout-warn { background: #1f1500; border-color: #3d2a00; color: #d4a017; }
   .callout-tip  { background: #0a1f0f; border-color: #1a3d22; color: #5cb87a; }
@@ -342,9 +378,21 @@
     padding: 1rem 1.1rem;
   }
 
-  .feature-icon { font-size: 18px; margin-bottom: 8px; display: block; }
-  .feature-card h4 { font-family: var(--display); font-size: 13.5px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-  .feature-card p  { font-size: 12.5px; color: var(--muted); margin: 0; }
+  .feature-icon {
+    font-size: 18px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .feature-card h4 {
+    font-family: var(--display);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .feature-card p { font-size: 12.5px; color: var(--muted); margin: 0; }
 
   /* Copy button */
   .pre-wrap { position: relative; }
@@ -377,6 +425,7 @@
     flex-wrap: wrap;
     gap: 8px;
   }
+
   .footer a { color: var(--accent); text-decoration: none; }
 
   /* Mobile */
@@ -412,37 +461,33 @@
 
   <div class="nav-section">
     <div class="nav-label">Getting Started</div>
-    <a href="#overview"     class="nav-link active"><span class="nav-dot"></span>Overview</a>
+    <a href="#overview" class="nav-link active"><span class="nav-dot"></span>Overview</a>
     <a href="#installation" class="nav-link"><span class="nav-dot"></span>Installation</a>
-    <a href="#quickstart"   class="nav-link"><span class="nav-dot"></span>Quick Start</a>
+    <a href="#quickstart" class="nav-link"><span class="nav-dot"></span>Quick Start</a>
   </div>
 
   <div class="nav-section">
     <div class="nav-label">API Reference</div>
-    <a href="#m-new"          class="nav-link"><span class="nav-dot"></span>flag.new()</a>
-    <a href="#m-up"           class="nav-link"><span class="nav-dot"></span>flag:Up()</a>
-    <a href="#m-down"         class="nav-link"><span class="nav-dot"></span>flag:Down()</a>
-    <a href="#m-toggle"       class="nav-link"><span class="nav-dot"></span>flag:Toggle()</a>
-    <a href="#m-get"          class="nav-link"><span class="nav-dot"></span>flag:Get()</a>
-    <a href="#m-changed"      class="nav-link"><span class="nav-dot"></span>flag:Changed()</a>
-    <a href="#m-onevent"      class="nav-link"><span class="nav-dot"></span>flag:OnEvent()</a>
-    <a href="#m-waituntil"    class="nav-link"><span class="nav-dot"></span>flag:WaitUntil()</a>
+    <a href="#m-new" class="nav-link"><span class="nav-dot"></span>flag.new()</a>
+    <a href="#m-up" class="nav-link"><span class="nav-dot"></span>flag:Up()</a>
+    <a href="#m-down" class="nav-link"><span class="nav-dot"></span>flag:Down()</a>
+    <a href="#m-toggle" class="nav-link"><span class="nav-dot"></span>flag:Toggle()</a>
+    <a href="#m-get" class="nav-link"><span class="nav-dot"></span>flag:Get()</a>
+    <a href="#m-changed" class="nav-link"><span class="nav-dot"></span>flag:Changed()</a>
+    <a href="#m-onevent" class="nav-link"><span class="nav-dot"></span>flag:OnEvent()</a>
+    <a href="#m-waituntil" class="nav-link"><span class="nav-dot"></span>flag:WaitUntil()</a>
     <a href="#m-executeuntil" class="nav-link"><span class="nav-dot"></span>flag:ExecuteUntil()</a>
     <a href="#m-executeafter" class="nav-link"><span class="nav-dot"></span>flag:ExecuteAfter()</a>
-    <a href="#m-destroy"      class="nav-link"><span class="nav-dot"></span>flag:Destroy()</a>
-    <a href="#types"          class="nav-link"><span class="nav-dot"></span>Types</a>
+    <a href="#m-executewhile" class="nav-link"><span class="nav-dot"></span>flag:ExecuteWhile()</a>
+    <a href="#m-destroy" class="nav-link"><span class="nav-dot"></span>flag:Destroy()</a>
+    <a href="#types" class="nav-link"><span class="nav-dot"></span>Types</a>
   </div>
 
   <div class="nav-section">
     <div class="nav-label">Examples</div>
     <a href="#ex-flashlight" class="nav-link"><span class="nav-dot"></span>Flashlight Toggle</a>
-    <a href="#ex-combat"     class="nav-link"><span class="nav-dot"></span>Combat State</a>
-    <a href="#ex-loading"    class="nav-link"><span class="nav-dot"></span>Loading Gate</a>
-  </div>
-
-  <div class="nav-section">
-    <div class="nav-label">Project</div>
-    <a href="https://github.com/GimmyFimmy/FlagUtil" target="_blank" class="nav-link"><span class="nav-dot"></span>GitHub ↗</a>
+    <a href="#ex-combat" class="nav-link"><span class="nav-dot"></span>Combat State</a>
+    <a href="#ex-loading" class="nav-link"><span class="nav-dot"></span>Loading Gate</a>
   </div>
 </nav>
 
@@ -459,9 +504,8 @@
       A lightweight, type-safe boolean state machine for Roblox. React to state changes, run frame-perfect loops, and coordinate async behavior — all without polling.
     </p>
     <div class="hero-actions">
-      <a href="#quickstart"   class="btn btn-primary">Get Started</a>
+      <a href="#quickstart" class="btn btn-primary">Get Started</a>
       <a href="#api-reference" class="btn btn-secondary">API Reference</a>
-      <a href="https://github.com/GimmyFimmy/FlagUtil" target="_blank" class="btn btn-secondary">GitHub ↗</a>
     </div>
   </div>
 
@@ -471,6 +515,7 @@
     <p>
       FlagUtil wraps a single boolean into a rich reactive object. Instead of scattering <code>if isAlive then</code> checks across your codebase, you declare intent: <em>run this while the flag is Up, stop when it goes Down.</em>
     </p>
+
     <div class="feature-grid">
       <div class="feature-card">
         <span class="feature-icon">⚡</span>
@@ -499,10 +544,12 @@
   <section class="section" id="installation">
     <h2>Installation</h2>
     <p>Place <code>FlagUtil.lua</code> (or <code>FlagUtil.luau</code>) inside <code>ReplicatedStorage</code> or wherever your shared modules live. Then require it from any script:</p>
+
     <div class="pre-wrap">
       <button class="copy-btn" onclick="copyCode(this)">copy</button>
       <pre><code><span class="kw">local</span> <span class="fn">FlagUtil</span> <span class="op">=</span> require(game.ReplicatedStorage:WaitForChild(<span class="str">"FlagUtil"</span>))</code></pre>
     </div>
+
     <div class="callout callout-info">
       <span class="callout-icon">ℹ</span>
       <p>FlagUtil has no external dependencies. It only requires <code>RunService</code> from Roblox services.</p>
@@ -513,6 +560,7 @@
   <section class="section" id="quickstart">
     <h2>Quick Start</h2>
     <p>Create a flag, react to it, and clean up when done.</p>
+
     <div class="pre-wrap">
       <button class="copy-btn" onclick="copyCode(this)">copy</button>
       <pre><code><span class="kw">local</span> <span class="fn">FlagUtil</span> <span class="op">=</span> require(game.ReplicatedStorage:WaitForChild(<span class="str">"FlagUtil"</span>))
@@ -803,6 +851,45 @@ sprinting:<span class="fn">Down</span>() <span class="cm">-- stamina drain stops
     </div>
   </section>
 
+  <!-- flag:ExecuteWhile -->
+  <section class="section" id="m-executewhile">
+    <div class="api-card">
+      <div class="api-header">
+        <span class="api-name">flag:ExecuteWhile</span>
+        <span class="api-sig">(state: boolean, predicate: (dt: number, ...any) → (), ...any) → CancelFn</span>
+        <span class="tag tag-cleanup">CancelFn</span>
+      </div>
+      <div class="api-body">
+        <p>Binds <code>predicate</code> to <code>RenderStep</code> and calls it every frame <em>while</em> the flag matches <code>state</code>. Unlike <code>ExecuteUntil</code>, the binding persists indefinitely — when the flag flips away from <code>state</code> the predicate simply stops being called, and when it flips back the predicate resumes automatically. Always returns a <code>CancelFn</code> to unbind entirely.</p>
+        <table class="params">
+          <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+          <tr><td>state</td><td>boolean</td><td>The state during which the predicate is called each frame.</td></tr>
+          <tr><td>predicate</td><td>(dt: number, ...any) → ()</td><td>Called every frame while the flag matches state.</td></tr>
+          <tr><td>...</td><td>any</td><td>Extra arguments forwarded to predicate on every frame.</td></tr>
+        </table>
+        <div class="callout callout-info" style="margin-top:0.75rem;">
+          <span class="callout-icon">ℹ</span>
+          <p>The key difference from <code>ExecuteUntil</code>: the RenderStep binding stays alive across multiple Up/Down cycles. Use this when you want a single persistent binding that automatically pauses and resumes, rather than re-registering each time.</p>
+        </div>
+      </div>
+    </div>
+    <div class="pre-wrap">
+      <button class="copy-btn" onclick="copyCode(this)">copy</button>
+      <pre><code><span class="kw">local</span> sprinting <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Down)
+
+<span class="cm">-- Single binding that runs whenever sprinting is Up</span>
+<span class="kw">local</span> cancel <span class="op">=</span> sprinting:<span class="fn">ExecuteWhile</span>(FlagUtil.States.Up, <span class="kw">function</span>(dt: number)
+    stamina <span class="op">-=</span> dt <span class="op">*</span> <span class="num">10</span>
+<span class="kw">end</span>)
+
+sprinting:<span class="fn">Up</span>()   <span class="cm">-- predicate starts firing</span>
+sprinting:<span class="fn">Down</span>() <span class="cm">-- predicate pauses (binding still alive)</span>
+sprinting:<span class="fn">Up</span>()   <span class="cm">-- predicate resumes automatically</span>
+
+<span class="fn">cancel</span>()         <span class="cm">-- fully unbinds the RenderStep</span></code></pre>
+    </div>
+  </section>
+
   <!-- flag:Destroy -->
   <section class="section" id="m-destroy">
     <div class="api-card">
@@ -830,6 +917,7 @@ sprinting:<span class="fn">Down</span>() <span class="cm">-- stamina drain stops
   <!-- Types -->
   <section class="section" id="types">
     <h3>Exported Types</h3>
+
     <div class="pre-wrap">
       <button class="copy-btn" onclick="copyCode(this)">copy</button>
       <pre><code><span class="cm">-- A function that cancels an async operation</span>
@@ -854,6 +942,7 @@ sprinting:<span class="fn">Down</span>() <span class="cm">-- stamina drain stops
     WaitUntil:    (self: <span class="type">Flag</span>, state: boolean) <span class="op">-></span> (),
     ExecuteUntil: (self: <span class="type">Flag</span>, state: boolean, predicate: (dt: number, ...any) <span class="op">-></span> (), ...any) <span class="op">-></span> <span class="type">CancelFn</span>?,
     ExecuteAfter: (self: <span class="type">Flag</span>, state: boolean, predicate: (dt: number, ...any) <span class="op">-></span> (), ...any) <span class="op">-></span> <span class="type">CancelFn</span>,
+    ExecuteWhile: (self: <span class="type">Flag</span>, state: boolean, predicate: (dt: number, ...any) <span class="op">-></span> (), ...any) <span class="op">-></span> <span class="type">CancelFn</span>,
 
     Destroy:      (self: <span class="type">Flag</span>) <span class="op">-></span> (),
 }</code></pre>
@@ -865,6 +954,7 @@ sprinting:<span class="fn">Down</span>() <span class="cm">-- stamina drain stops
     <h2>Examples</h2>
     <h3>Flashlight Toggle</h3>
     <p>Toggle a spotlight on/off with <code>F</code>, running a sway effect only while the flashlight is on.</p>
+
     <div class="pre-wrap">
       <button class="copy-btn" onclick="copyCode(this)">copy</button>
       <pre><code><span class="kw">local</span> FlagUtil <span class="op">=</span> require(game.ReplicatedStorage:WaitForChild(<span class="str">"FlagUtil"</span>))
@@ -895,6 +985,7 @@ flashlight:<span class="fn">ExecuteAfter</span>(FlagUtil.States.Up, <span class=
   <section class="section" id="ex-combat">
     <h3>Combat State</h3>
     <p>Lock out actions during an attack animation using <code>WaitUntil</code>.</p>
+
     <div class="pre-wrap">
       <button class="copy-btn" onclick="copyCode(this)">copy</button>
       <pre><code><span class="kw">local</span> attacking <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Down)
@@ -902,12 +993,12 @@ flashlight:<span class="fn">ExecuteAfter</span>(FlagUtil.States.Up, <span class=
 <span class="kw">local function</span> <span class="fn">attack</span>()
     <span class="kw">if</span> attacking:<span class="fn">Get</span>() <span class="kw">then</span> <span class="kw">return</span> <span class="kw">end</span> <span class="cm">-- busy</span>
     attacking:<span class="fn">Up</span>()
-
+    
     <span class="cm">-- Play anim, wait for it to finish</span>
     <span class="kw">local</span> track <span class="op">=</span> animator:<span class="fn">LoadAnimation</span>(attackAnim)
     track:<span class="fn">Play</span>()
     track.Stopped:<span class="fn">Wait</span>()
-
+    
     attacking:<span class="fn">Down</span>()
 <span class="kw">end</span>
 
@@ -922,6 +1013,7 @@ task.<span class="fn">spawn</span>(<span class="kw">function</span>()
   <section class="section" id="ex-loading">
     <h3>Loading Gate</h3>
     <p>Block game logic until assets are ready using <code>OnEvent</code> and <code>WaitUntil</code>.</p>
+
     <div class="pre-wrap">
       <button class="copy-btn" onclick="copyCode(this)">copy</button>
       <pre><code><span class="kw">local</span> loaded <span class="op">=</span> FlagUtil.<span class="fn">new</span>(FlagUtil.States.Down)
@@ -957,13 +1049,18 @@ task.<span class="fn">spawn</span>(<span class="kw">function</span>()
 <script>
   function copyCode(btn) {
     const pre = btn.nextElementSibling;
-    navigator.clipboard.writeText(pre.innerText).then(() => {
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
       btn.textContent = 'copied!';
       btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+      setTimeout(() => {
+        btn.textContent = 'copy';
+        btn.classList.remove('copied');
+      }, 2000);
     });
   }
 
+  // Active nav link on scroll
   const sections = document.querySelectorAll('section[id], div[id]');
   const navLinks = document.querySelectorAll('.nav-link');
 
